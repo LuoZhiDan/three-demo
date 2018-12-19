@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SVG 地图</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="http://10.0.3.114:7000/libs/jquery.js"></script>
+    <script src="http://10.0.3.114:7000/libs/d3.js"></script>
+    <script src="http://10.0.3.114:7000/libs/tbase.js"></script>
+    <script src="http://10.0.3.114:7000/libs/echarts-all.js"></script>
+    <script src="http://10.0.3.114:7000/libs/require.js"></script>
+    <style>
+        html {
+            width: 100%;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            background: #ffffff;
+            width: 100%;
+            height: 100%;
+        }
+
+        div#main {
+            width: 100%;
+            height: 100%;
+            background: #232323;
+            margin: 0;
+            position: relative;
+            /* width:672px;height:968px; */
+            /*background: url("images/bg1.jpg") center center no-repeat; opacity: 1;		*/
+            background-size: 100% 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main" style="height:100%;width:100%;"></div>
+</body>
+<script>
+    require(['Zd_svgMap_init'], function (Map) {
+        new Map.svgMap($('#main'), {
+            controls: {
+                shadowColor: "rgba(61,162,209,0.3)",
+                shadowRate: 2.5,
+                shadowType: 0,
+                shadowLayers: 3,
+                enablePan: false, // 平移
+                enableZoom: false, // 缩放
+                enableRotate: false // 旋转
+            },
+            tags: {
+                showTags: false
+            },
+            sceneStyle: {
+                outBorderColor: ['rgba(50, 181, 237, 1)'],
+                outBorderWidth: 2,
+                blockColor: ['rgba(50, 181, 237, 0.4)', 'rgba(10, 83, 145, 0.4)', 'rgba(10, 83, 145, 0.2)'],   //区块颜色
+                borderColor: "#4af2ff",  //边线颜色
+                borderWidth: 5,  //边线宽度
+                highLightColor: '#ff0000'
+            },
+            texture: {},
+            outerGlow: {
+                pointShow: false,
+
+                glowShow: true, //外发光 显示或隐藏   true/false  由 type 属性分拆
+                glowColor: "RGBA(47,178,234,0.3)", //外发光颜色  RGBA,
+                glowSize: 1
+            }
+        }, [ // 标注偏移
+                new THREE.Vector3(220, 0, 0),
+                new THREE.Vector3(280, -40, 0),
+                new THREE.Vector3(0, 40, 0),
+                new THREE.Vector3(120, 40, 0)
+            ], function (obj) { // 点击事件传参
+                var name = obj.name;
+                $('#txt_a154349802066283').widget().setCurrentValue(name);
+            });
+    });
+</script>
+
+</html>
