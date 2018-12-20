@@ -34,7 +34,7 @@ export default class ModelClass{
         var opts = this._options;
         var data = opts.geojson;
         const convert = d3.geoPath( this.projection );
-
+        
         (data.features || data.series).map((d, i) => {
             let path = convert( d );
             this._store.push({
