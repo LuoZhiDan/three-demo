@@ -1,7 +1,7 @@
-import textureImg from './UV_Grid_Sm.jpg';
+// import textureImg from './UV_Grid_Sm.jpg';
 // import textureImg from './bg.jpg';
 // import textureImg from './1.png';
-// import textureImg from './blockTexture.png';
+import textureImg from './blockTexture.png';
 
 import Model from './ModelClass';
 import geojson from './500000.json';
@@ -24,7 +24,7 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000);
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 20000);
-    camera.position.set(0, 700, 700);
+    camera.position.set(0, 700, 600);
     scene.add( camera );
     var light = new THREE.PointLight(0xffffff, 0.8);
     camera.add( light );
@@ -35,12 +35,12 @@ function init() {
     var texture = loader.load( textureImg ) ;
     // it's necessary to apply these settings in order to correctly display the texture on a shape geometry
     // texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
-    texture.repeat.set(1/2000, 1/1000);
+    texture.repeat.set(1/1024, 1/1024);
     texture.rotation = Math.PI/2
     texture.center.set(0, 1)
 
     var axesHelper = new THREE.AxesHelper( 500 );
-    scene.add( axesHelper );
+    // scene.add( axesHelper );
 
     function addShape(mapObj, shape, extrudeSettings, color) {
         var points = shape[0].getPoints();
@@ -114,9 +114,10 @@ function init() {
 
         var geometryPoints = new THREE.BufferGeometry();
         geometryPoints.addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-        var line = new THREE.Line(geometryPoints, new THREE.LineBasicMaterial({ 
+        var line = new THREE.Line2(geometryPoints, new THREE.LineBasicMaterial({ 
             color: color,
             depthTest: false,
+            linewidth: 5,
             transparent: true
         }));
         line.translateY(0.2)
@@ -216,7 +217,7 @@ function init() {
     });
 
     // mapObj.rotation.set(Math.PI, 0, 0);
-    mapObj.position.set(-2000 * 0.5, 0, -1000 * 0.5);
+    mapObj.position.set(-1024 * 0.5, 0, -1024 * 0.5);
     // mapObj.scale.set(2, 1, 2);
     
     // mapObj.position.set(-512 * 1, 0, -512 * 1);

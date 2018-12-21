@@ -1,8 +1,8 @@
 import { copies, svgPath } from 'common-utils-zdluoa';
 
 const _default = {
-    width: 2000,
-    height: 1000,
+    width: 1024,
+    height: 1024,
     padding: 10,
     geojson: null
 }
