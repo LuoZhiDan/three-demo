@@ -1,8 +1,8 @@
 import { copies, svgPath } from 'common-utils-zdluoa';
 
 const _default = {
-    width: 1024,
-    height: 1024,
+    width: 2000,
+    height: 1000,
     padding: 10,
     geojson: null
 }
@@ -34,7 +34,7 @@ export default class ModelClass{
         var opts = this._options;
         var data = opts.geojson;
         const convert = d3.geoPath( this.projection );
-        
+
         (data.features || data.series).map((d, i) => {
             let path = convert( d );
             this._store.push({
@@ -42,7 +42,7 @@ export default class ModelClass{
                 name: d.properties.name,
                 cp: this.projection( d.properties.cp ),// 中心点
                 // path: path, // svg 路径
-                shape: svgPath( path )
+                shape: svgPath( path ).toShapes()
             });
         });
 

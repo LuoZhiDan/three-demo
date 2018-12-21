@@ -1,4 +1,7 @@
 import textureImg from './UV_Grid_Sm.jpg';
+// import textureImg from './bg.jpg';
+// import textureImg from './1.png';
+// import textureImg from './blockTexture.png';
 
 import Model from './ModelClass';
 import geojson from './500000.json';
@@ -20,50 +23,106 @@ function init() {
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000);
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000000);
-    camera.position.set(0, 0, 500);
-    scene.add(camera);
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 20000);
+    camera.position.set(0, 700, 700);
+    scene.add( camera );
     var light = new THREE.PointLight(0xffffff, 0.8);
-    camera.add(light);
+    camera.add( light );
     group = new THREE.Group();
-    group.position.y = 50;
+    // group.position.y = 50;
     scene.add(group);
     var loader = new THREE.TextureLoader();
     var texture = loader.load( textureImg ) ;
     // it's necessary to apply these settings in order to correctly display the texture on a shape geometry
-    texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
-    texture.repeat.set(0.001, 0.001);
-    // texture.rotation = Math.PI
-    // texture.offset.set(1, 1)
+    // texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
+    texture.repeat.set(1/2000, 1/1000);
+    texture.rotation = Math.PI/2
+    texture.center.set(0, 1)
 
     var axesHelper = new THREE.AxesHelper( 500 );
-    // scene.add( axesHelper );
+    scene.add( axesHelper );
 
-    function addShape(mapObj, shape, extrudeSettings, color, x, y, z, rx, ry, rz, s) {
-        var points = shape.getPoints();
-        var geometry = new THREE.Geometry().setFromPoints(points);
-        geometry.computeFaceNormals ()
-        console.log(geometry)
+    function addShape(mapObj, shape, extrudeSettings, color) {
+        var points = shape[0].getPoints();
+        // var len = Math.floor(shape[0].getLength()/2.4)
+
+        // points = shape[0].getSpacedPoints(len);
+        // points.reverse();
+        // var path = new THREE.Shape();
+        // path.setFromPoints(points)
+        // shape = path;
+        // var geometry = new THREE.ShapeBufferGeometry( shape );
+
+        // var position = geometry.getAttribute('position');
+        // var array = position.array;
+        // var count  = position.count;
+        
+        // var newArr = [];
+        // for(let i = 0; i< count; i++){
+        //     var ind = i * 3;
+        //     newArr.push(array [ind] );
+        //     newArr.push(array [ind + 2] );
+        //     newArr.push(array [ind + 1] );
+        // }
+
+        // position.setArray(new Float32Array(newArr))
+
+
+        var vertices = [], uv = [],
+        faces = THREE.ShapeUtils.triangulateShape(points, [] ),
+        indexs = [];
+
+        points.map(item=>{
+            uv.push(item.y, item.x);
+            vertices.push(item.x, 0, item.y);
+        });
+
+        faces.map(item=>{
+            indexs.push(item[0], item[1], item[2]);
+        });
+
+        var geometry = new THREE.BufferGeometry( );
+
+        geometry.setIndex(indexs);
+        geometry.addAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+        geometry.addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+
         // if(THREE.ShapeUtils.isClockWise( geometry.vertices )){
         //     geometry.vertices.reverse();
         // }
         var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
-            side: THREE.DoubleSide, 
+            side: THREE.BackSide, 
             depthTest: false,
             transparent: true,
             map: texture 
         }));
-        mesh.translateZ(-2)
+
+        mesh.translateY(0.1)
         mapObj.add (mesh );
 
         var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ 
-            side: THREE.DoubleSide, 
+            color: 0x61E9F8,
+            side: THREE.BackSide, 
             depthTest: false,
             transparent: true,
-            map: texture 
+            opacity: 0,
+            // map: texture 
         }));
-        mesh.translateZ(20)
+        mesh.translateY(-20)
         mapObj.add (mesh );
+
+        var geometryPoints = new THREE.BufferGeometry();
+        geometryPoints.addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+        var line = new THREE.Line(geometryPoints, new THREE.LineBasicMaterial({ 
+            color: color,
+            depthTest: false,
+            transparent: true
+        }));
+        line.translateY(0.2)
+        mapObj.add (line );
+
+
         
         // flat shape
         var geometry = new THREE.ShapeBufferGeometry(shape);
@@ -79,29 +138,29 @@ function init() {
         var geometry = new THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
         geometry.computeBoundingSphere();
 
-        var material01 = new THREE.MeshPhongMaterial({ 
+        var material01 = new THREE.MeshBasicMaterial({ 
             color: 0x61E9F8,
             depthTest: true,
             opacity: 0,
             transparent: true
         });
 
-        var material02 = new THREE.MeshPhongMaterial({ 
+        var material02 = new THREE.MeshBasicMaterial({ 
             color: 0x61E9F8,
             depthTest: true,
             transparent: true,
-            opacity: 0.8
+            opacity: 0.4
             // map: texture 
         });
 
         var mesh = new THREE.Mesh(geometry, [material01, material02] );
         
         // mesh.position.set(center.x, center.y, center.z);
-        // mesh.rotation.set(rx, ry, rz);
+        mesh.rotation.set(Math.PI/2, 0, 0);
         // mesh.scale.set(s, s, s);
         mapObj.add( mesh );
 
-        addLineShape(mapObj, shape, color, x, y, z, rx, ry, rz, s);
+        // addLineShape(mapObj, shape, color, x, y, z, rx, ry, rz, s);
     }
 
     function addLineShape(group, shape, color, x, y, z, rx, ry, rz, s) {
@@ -122,7 +181,7 @@ function init() {
         // line.scale.set(s, s, s);
         line.translateZ(-2)
 
-        group.add(line);
+        group.add( line );
 
         // line from equidistance sampled points
         var line = new THREE.Line(geometrySpacedPoints, new THREE.LineBasicMaterial({ color: color }));
@@ -151,112 +210,17 @@ function init() {
     var store = model.getStore();
     var mapObj = new THREE.Object3D();
     var extrudeSettings = { depth: 18, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
-    
-    var geo = new THREE.Geometry();
-    store.map(function( item, i ){
-        var geometry = new THREE.ShapeGeometry(item.shape);
-        geo.merge( geometry );
-    });
-    // geo.mergeVertices();
-    var obj = new THREE.Object3D();
-
-    function merge( geo ) {
-        console.time()
-        geo.computeBoundingSphere ();
-        var cp = geo.boundingSphere.center;
-        var r = geo.boundingSphere.radius;
-        var vertices = geo.vertices;
-        var verticeMap = {};
-        var precisionPoints = 4;
-        var key;
-        var precision = Math.pow( 10, precisionPoints );
-        var unique = [];
-
-        for(var i = 0, il = vertices.length; i < il; i++){
-            var v = vertices[i];
-            key = Math.round( v.x * precision ) + '_' + Math.round( v.y * precision ) + '_' + Math.round( v.z * precision );
-            if(verticeMap[key] === undefined){
-                verticeMap[key] = 1;
-                unique.push( v );
-            } else {
-                verticeMap[key]++;
-            }
-        }
-
-        var  newUnique = [];
-        var last = null;
-        for(var i = 0, il = unique.length; i < il; i++){
-            var v = unique[i];
-            key = Math.round( v.x * precision ) + '_' + Math.round( v.y * precision ) + '_' + Math.round( v.z * precision );
-            var key2;
-            var v2 = unique[i + 1];
-            if(v2) {
-                key2 = Math.round( v2.x * precision ) + '_' + Math.round( v2.y * precision ) + '_' + Math.round( v2.z * precision );
-            }
-            
-            if(verticeMap[key] === 1){
-                newUnique.push( v );
-            }
-            
-            last = key;
-        }
-        geo.vertices = newUnique;
-    }
-
-    merge( geo )
-
-
-    function drawLine( geo ) {
-        var vertices = geo.vertices;
-        var vers = [];
-        for (let i = 0, il = vertices.length; i<il - 1; i++){
-            var v1 = vertices[i], v2 = vertices[i + 1];
-            
-            var l = Math.sqrt(Math.pow(v1.x - v2.x, 2) + Math.pow(v1.y - v2.y, 2));
-            if(l > 30){
-                var g = new THREE.Geometry();
-                g.vertices = vers
-                var Line = new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xff0000 }));
-                obj.add( Line );
-                vers = [];
-            } else{
-                vers.push(v1);
-            }
-           
-        }
-
-        var g = new THREE.Geometry();
-        g.vertices = vers
-        var Line = new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xff0000 }));
-        obj.add( Line );
-        
-    }
-
-    // function drawLine( geo ) {
-    //     var vertices = geo.vertices;
-    //     var g = new THREE.Geometry();
-    //     g.vertices = vertices
-    //     var Line = new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xff0000 }));
-    //     obj.add( Line );
-        
-    // }
-
-    drawLine( geo );
-
-    obj.scale.set(0.6, 0.6, 1);
-    obj.rotation.set(Math.PI, 0, 0);
-    obj.position.set(- 507 * 0.6, 506 * 0.6, 0);
-
-    // scene.add( obj );
 
     store.map(function( item ){
         addShape(mapObj, item.shape, extrudeSettings, 0x00f000, -500, 300, 0, Math.PI, 0, 0, 1);
     });
 
-    mapObj.scale.set(0.6, 0.6, 1);
     // mapObj.rotation.set(Math.PI, 0, 0);
-    mapObj.position.set(0, -1024 * 0.6, 0);
+    mapObj.position.set(-2000 * 0.5, 0, -1000 * 0.5);
+    // mapObj.scale.set(2, 1, 2);
     
+    // mapObj.position.set(-512 * 1, 0, -512 * 1);
+    // mapObj.scale.set(2, 1, 2);
 
     scene.add( mapObj )
     
