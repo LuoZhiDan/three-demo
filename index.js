@@ -112,16 +112,34 @@ function init() {
         mesh.translateY(-20)
         mapObj.add (mesh );
 
-        var geometryPoints = new THREE.BufferGeometry();
+
+        /* var geometryPoints = new THREE.BufferGeometry();
         geometryPoints.addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-        var line = new THREE.Line2(geometryPoints, new THREE.LineBasicMaterial({ 
+        var line = new THREE.Line(geometryPoints, new THREE.LineBasicMaterial({ 
             color: color,
             depthTest: false,
-            linewidth: 5,
             transparent: true
         }));
         line.translateY(0.2)
-        mapObj.add (line );
+        mapObj.add (line ); */
+
+        var geometry = new THREE.LineGeometry();
+        geometry.setPositions( vertices );
+        // geometry.setColors( colors );
+        var matLine = new THREE.LineMaterial( {
+            color: 0xffffff,
+            linewidth: 0.5/1024, // in pixels
+            transparent: true,
+            depthTest: false,
+            // vertexColors: THREE.VertexColors,
+            //resolution:  // to be set by renderer, eventually
+            dashed: false
+        } );
+        var line = new THREE.Line2( geometry, matLine );
+        // line.computeLineDistances();
+        // line.scale.set( 1, 1, 1 );
+        line.translateY(0.2)
+        mapObj.add( line );
 
 
         
