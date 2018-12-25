@@ -42,7 +42,7 @@ export default class ModelClass{
                 name: d.properties.name,
                 cp: this.projection( d.properties.cp ),// 中心点
                 // path: path, // svg 路径
-                shape: svgPath( path ).toShapes()
+                shape: svgPath( path )
             });
         });
 

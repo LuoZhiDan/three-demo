@@ -43,7 +43,7 @@ function init() {
     // scene.add( axesHelper );
 
     function addShape(mapObj, shape, extrudeSettings, color) {
-        var points = shape[0].getPoints();
+        var points = shape.getPoints();
         // var len = Math.floor(shape[0].getLength()/2.4)
 
         // points = shape[0].getSpacedPoints(len);
@@ -127,7 +127,7 @@ function init() {
         geometry.setPositions( vertices );
         // geometry.setColors( colors );
         var matLine = new THREE.LineMaterial( {
-            color: 0xffffff,
+            color: 0xff00ff,
             linewidth: 0.5/1024, // in pixels
             transparent: true,
             depthTest: false,
